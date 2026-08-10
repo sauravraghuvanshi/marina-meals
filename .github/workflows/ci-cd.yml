@@ -120,7 +120,7 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure App Service
-        uses: Azure/webapps-deploy@b686016b4de8820a23519503685d8d03fbfa03a6 # v3
+        uses: Azure/webapps-deploy@02a81bead70021f5284939794bcec79c271ab383 # v3
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           package: deployment.zip

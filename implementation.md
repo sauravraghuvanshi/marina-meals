@@ -26,27 +26,28 @@
 ## 1. Architecture
 
 ```
-┌──────────────────────────┐    WebSocket (PCM16 @ 24kHz)    ┌───────────────────────────┐
-│  Frontend (React + Vite) │ ◄──────────────────────────────►│  Azure Voice Live API      │
-│  - Chennai-themed UI      │     audio in / audio out         │  (under AI Foundry project)│
-│  - mic capture (worklet)  │                                  │  STT → GenAI model → TTS   │
-│  - audio playback         │                                  │  semantic VAD + barge-in   │
-│  - live menu / cart / map │                                  └────────────┬──────────────┘
-└────────────┬──────────────┘                                               │ function-call events
-             │ REST (/api/*)                                                 │ (tool calls)
-             ▼                                                               ▼
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│  Backend (FastAPI, Python)                                                                 │
-│  - GET /api/session   → mints ephemeral Voice Live credentials (key stays server-side)     │
-│  - Tool handlers invoked from the voice loop:                                              │
-│       get_menu · get_item_price · get_todays_specials · find_store · place_order           │
-│  - Reads real-time data from data/menu.json + data/stores.json (swap for DB/API later)     │
-└─────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────┐  /ws/voice (ticket + PCM16)  ┌─────────────────────────────┐
+│  Frontend (React + Vite) │ ◄───────────────────────────►│  Backend (FastAPI)          │
+│  - Chennai-themed UI      │                              │  - Entra token validation   │
+│  - mic capture/worklet    │       REST (/api/*)          │  - managed-identity WS proxy│
+│  - playback + barge-in    │ ◄───────────────────────────►│  - server-owned voice policy│
+│  - menu/cart/store sync   │                              │  - live tool handlers       │
+└──────────────────────────┘                              └──────────────┬──────────────┘
+                                                                        │ Authorization:
+                                                                        │ managed identity
+                                                                        ▼
+                                                         ┌─────────────────────────────┐
+                                                         │ Azure Voice Live API        │
+                                                         │ (AI Foundry project)        │
+                                                         │ STT → model → TTS           │
+                                                         └─────────────────────────────┘
 ```
 
 **Why this shape:** Voice Live is fully managed, so the backend does **not** orchestrate
-STT/LLM/TTS. The backend's only jobs are (a) issuing short-lived session credentials so the
-Speech key never reaches the browser, and (b) serving real-time data through tool calls.
+STT/LLM/TTS. The backend authenticates the browser, issues a short-lived single-use proxy ticket,
+owns the Voice Live session policy, attaches its managed-identity token upstream, constrains
+browser events, and serves real-time data through tool calls. Azure credentials never reach the
+browser.
 
 ---
 
@@ -57,8 +58,9 @@ Speech key never reaches the browser, and (b) serving real-time data through too
 - **Backend:** Python 3.11 + FastAPI + `uvicorn`. `websockets` for the Voice Live connection
   (the voice loop can run client-side **or** be proxied through the backend — see §7 for the
   recommended split).
-- **Azure:** Azure AI Foundry project + Azure AI Services (Speech / Voice Live) resource in a
-  region near Chennai (**Central India** or **South India**) to minimize round-trip latency.
+- **Azure:** Azure AI Foundry project + Azure AI Services (Speech / Voice Live). Select a region
+  that supports the required latest-GA realtime model and Voice Live capabilities; do not assume
+  regional availability from proximity alone.
 - **Data:** JSON files now; the tool layer is written so the data source can be swapped for a
   database or live API without touching the voice code.
 
@@ -249,8 +251,8 @@ implement matching handlers in the backend):
   summary + total + pickup store.
 - `show_on_screen`: **frontend-handled** — does not call the backend. The Voice Live client
   intercepts this tool call, looks up each `item_id` in the cached menu, and renders a modal
-  panel on the website. Returns `{ ok: true, shown: N }` to the model. The model must then ask
-  the customer aloud whether to read the items out, and only read them if the customer agrees.
+  panel on the website. Returns `{ ok: true, shown: N }` to the model. For a visual-only request,
+  the model says only one short acknowledgement and does not read the items or ask a follow-up.
 - All backend handlers re-read the JSON each call (simulates real-time / live menu).
 
 ---
@@ -414,18 +416,21 @@ ORDERING:
 ## 10. Configuration (`backend/.env.example`)
 
 ```
-AZURE_AI_FOUNDRY_PROJECT_ENDPOINT=
-AZURE_SPEECH_ENDPOINT=               # e.g. https://<resource>.cognitiveservices.azure.com
-AZURE_SPEECH_KEY=                    # SERVER-SIDE ONLY, never expose to browser
-AZURE_SPEECH_REGION=centralindia
+AZURE_SPEECH_ENDPOINT=https://<resource>.services.ai.azure.com
+AZURE_SPEECH_REGION=
 VOICE_LIVE_MODEL=                    # latest GA model deployment name
 VOICE_LIVE_API_VERSION=              # confirm current GA api-version from docs
 TTS_VOICE=ta-IN-PallaviNeural
 STT_LANGUAGES=en-IN,ta-IN     # English-first to bias detection in mixed contexts
+REQUIRE_APP_AUTH=false        # local development only; true in Azure
+ENTRA_TENANT_ID=
+ENTRA_CLIENT_ID=
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
-- `GET /api/session` returns a short-lived token/credentials + the WS URL + chosen model/voice
-  so the frontend can connect without ever seeing `AZURE_SPEECH_KEY`.
+- `GET /api/session` verifies the caller and returns only a short-lived, single-use proxy path.
+- Production uses App Service Authentication and cryptographically verified Entra ID tokens.
+- The Voice Live token remains server-side and is acquired through managed identity.
 - CORS: allow the Vite dev origin in dev.
 
 ---
@@ -449,8 +454,8 @@ Tamil text must use a font with proper Tamil glyph support (e.g. "Noto Sans Tami
 1. **Scaffold** the repo structure (§5). Add `data/menu.json` + `data/stores.json` (provided).
 2. **Backend tools** (`tools.py`): implement the 5 handlers against the JSON; unit-test them
    independently of voice (English + Tamil name matching, total computation, order ids).
-3. **`/api/session`**: mint credentials; return WS URL + model + voice. Verify the key is never
-   sent to the client.
+3. **`/api/session`**: verify identity and issue a short-lived single-use proxy ticket. Verify
+   Azure credentials and Voice configuration never reach the client.
 4. **Frontend audio**: `recorder.ts` (mic → PCM16 24kHz) and `player.ts` (delta playback queue).
 5. **Voice session**: `backend/voice_config.py` owns `session.update`; `voiceLiveClient.ts`
    streams audio, handles events, dispatches tools, and returns constrained function outputs.
@@ -485,10 +490,34 @@ Tamil text must use a font with proper Tamil glyph support (e.g. "Noto Sans Tami
       "Tell me top 5 dishes" speaks the list aloud and does NOT call `show_on_screen`.
 - [ ] **Modal auto-closes** on the customer's next utterance and on any non-`show_on_screen`
       tool call (price lookup, find_store, place_order, etc.) — no manual dismiss required.
+- [ ] **Authentication is fail-closed in Azure:** App Service Authentication requires Entra
+      sign-in; local development is the only `REQUIRE_APP_AUTH=false` environment.
+- [ ] **The privileged proxy is constrained:** the server owns `session.update`, validates
+      origins and tickets, allowlists client event shapes, and rejects unrecognized function
+      outputs.
+- [ ] **CI/CD is green:** every push and pull request runs backend tests, dependency checks, the
+      production frontend audit, and the strict build. Successful `main` pushes deploy through
+      GitHub OIDC and verify `/api/health`.
 
 ---
 
-## 14. Troubleshooting
+## 14. Operations and delivery
+
+- `.github/workflows/ci-cd.yml` runs CI on every push and pull request and deploys only `main`.
+- GitHub-to-Azure authentication uses OIDC and a dedicated user-assigned identity with
+  `Website Contributor` scoped to the single App Service.
+- The deployment identity must never be attached to the running application.
+- App Service Authentication uses a different managed identity for its client assertion; no
+  client secret is required.
+- Runtime Voice Live access stays on the App Service system-assigned identity.
+- Workflow actions are pinned to immutable commits and updated through Dependabot.
+- GitHub's OIDC subject may contain immutable owner and repository IDs. Use the subject emitted by
+  a real workflow token rather than assuming the legacy owner/repository-only format.
+- Use one Gunicorn worker while proxy tickets remain process-local.
+
+---
+
+## 15. Troubleshooting
 
 - **Poor Tamil recognition** → you are likely on the default multilingual mode; switch to the
   explicit `azure-speech` STT with `en-IN,ta-IN` (or `mai-transcribe-1.5`). See §4.

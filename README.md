@@ -136,6 +136,13 @@ identity. The repository contains no publish profile, Azure password, client
 secret, or long-lived deployment credential. Workflow actions are pinned to
 immutable commits, and Dependabot checks them weekly for updates.
 
+Runtime, deployment, and user authentication use separate identities:
+
+- the App Service system identity accesses Voice Live;
+- a GitHub-federated identity can deploy only to this web app;
+- a second identity supplies the App Service Authentication client assertion
+  without an expiring client secret.
+
 ## Run locally
 
 ### Prerequisites
@@ -390,6 +397,9 @@ The backend suite covers tool matching, Tamil names, live-data updates, server-s
 
 ```text
 marina-meals/
+├── .github/
+│   ├── workflows/ci-cd.yml      # Test every change; deploy successful main pushes
+│   └── dependabot.yml           # Weekly Actions, npm, and pip update checks
 ├── backend/
 │   ├── main.py                 # FastAPI routes and authenticated WebSocket proxy
 │   ├── tools.py                # Live menu, store, and order functions
@@ -412,8 +422,11 @@ marina-meals/
 - Keep `REQUIRE_APP_AUTH=true` outside local development.
 - Never place Azure keys, bearer tokens, tenant details, or concrete resource endpoints in source control.
 - Use managed identity and least-privilege role assignments.
+- Keep the GitHub deployment identity separate from every application runtime identity.
+- Keep the production workflow tied to the GitHub `production` environment; its OIDC subject includes immutable repository identifiers.
+- Run one Gunicorn worker while session tickets remain process-local. Use shared ticket storage before scaling out.
 - Replace JSON with a durable database or POS integration before using the ordering flow for real customers.
-- Add shared ticket storage, rate limiting, monitoring, and a paid App Service plan before scaling beyond a controlled demo.
+- Add rate limiting, monitoring, and a paid App Service plan before scaling beyond a controlled demo.
 
 ## Further reading
 

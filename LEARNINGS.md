@@ -16,6 +16,10 @@ next. Captures what worked, what broke, and which mistakes to not repeat.
 - [ ] Keep STT language order as `en-IN,ta-IN` (English first) in both the backend `STT_LANGUAGES` appsetting and the frontend fallback. Required to stop the agent flipping to Tamil on a single Tamil dish name.
 - [ ] Keep the proactive English greeting sent by the backend proxy once on `session.updated`. It is what makes the agent open in English instead of waiting for the user.
 - [ ] Keep panel auto-close hooks in `App.tsx`: `onUserSpeechStart` and the non-`show_on_screen` clear inside `handleTool`. Without them the modal lingers after the user moves on.
+- [ ] Keep App Service Authentication enabled in production. Local development is the only place where `REQUIRE_APP_AUTH=false` is acceptable.
+- [ ] Keep Gunicorn at one worker until session-ticket storage moves out of process memory.
+- [ ] Keep GitHub deployment, App Service authentication, and runtime Voice Live identities separate.
+- [ ] Keep GitHub Actions pinned to immutable SHAs; Dependabot owns routine action updates.
 
 ---
 
@@ -152,6 +156,77 @@ We added a 6th tool `show_on_screen({ title, item_ids })` that does **not** hit 
 **Smoke test that proves the migration worked end-to-end (server-side):**
 Connect through the application flow, obtain a short-lived ticket from `/api/session`, and open `/ws/voice` with the same authenticated browser session. Expect `session.created` followed by `session.updated`; client-supplied `session.update` events are intentionally rejected.
 
+### 14. Public repository security — sanitize before the first push
+
+The repository was published only after replacing the live Azure resource names, subscription
+identifier, deployment commands, and concrete Foundry endpoint with placeholders. Local `.env`
+files, build output, caches, certificates, credentials, and demo recordings are ignored.
+
+The security review found two important trust-boundary issues:
+
+- the SPA fallback joined an untrusted path without proving it remained under `frontend/dist`;
+- `/ws/voice` originally accepted any client and relayed arbitrary Voice Live frames under the
+  App Service managed identity.
+
+The final design resolves both at the root:
+
+- static paths are resolved and checked for containment before serving;
+- `/api/session` issues a 30-second, single-use ticket bound to the authenticated principal and
+  client address;
+- WebSocket origins are checked before acceptance;
+- Microsoft Entra ID tokens are verified cryptographically;
+- the backend owns `session.update`, tools, and the greeting;
+- the proxy allowlists exact browser event shapes and accepts function output only for a real
+  pending upstream call.
+
+**Lesson:** hiding a token is not enough. A managed-identity proxy is itself a privileged
+capability and must authenticate callers, constrain protocol messages, and own policy.
+
+### 15. Passwordless App Service Authentication needs a separate identity
+
+App Service Authentication now requires Microsoft Entra sign-in, keeps `/api/health` available
+for liveness, and uses a managed-identity client assertion instead of an expiring client secret.
+
+The authentication identity is intentionally separate from:
+
+- the system-assigned runtime identity that calls Voice Live; and
+- the GitHub deployment identity that has `Website Contributor` on the web app.
+
+Never attach the deployment identity to the running app. Doing so would let application code
+inherit its own deployment permissions.
+
+Session tickets are stored in process memory, so Gunicorn must use one worker. A second worker can
+receive the WebSocket after another worker issued the ticket and reject an otherwise valid
+connection. Shared storage is required before adding workers or instances.
+
+### 16. GitHub Actions OIDC subjects can include immutable repository IDs
+
+The pipeline runs backend tests and the frontend production build on every push and pull request.
+Only a successful push to `main` enters the `production` environment and deploys.
+
+The first OIDC login failed even though the conventional subject
+`repo:<owner>/<repo>:environment:production` was configured. GitHub presented a subject containing
+the owner ID and repository ID:
+
+`repo:<owner>@<owner-id>/<repo>@<repo-id>:environment:production`
+
+The exact subject is shown in the `azure/login` failure log and by GitHub's OIDC customization
+endpoint. Configure Azure federation against the presented value rather than assuming the older
+string format.
+
+The final pipeline uses:
+
+- a dedicated user-assigned identity;
+- `Website Contributor` scoped to the one App Service;
+- GitHub environment variables for non-secret identifiers;
+- zero GitHub environment secrets;
+- immutable action SHAs;
+- Dependabot for GitHub Actions, npm, and pip updates;
+- a post-deploy `/api/health` check.
+
+**Lesson:** validate OIDC with a real workflow run. Static federation review cannot detect an
+organization or repository subject-template customization.
+
 ---
 
 - **Server-side totals on `place_order`.** Never trust the model to compute money — recompute on the backend and return the canonical total. The model parrots whatever we send back.
@@ -174,7 +249,7 @@ Connect through the application flow, obtain a short-lived ticket from `/api/ses
 ## Future work / parking lot
 
 - Switch hosting plan to **B1** for sustained demos (F1 cold-starts and has WS connection limits).
-- Pin `websockets` version explicitly in `requirements.txt` to avoid the kwarg-mismatch class of bugs.
 - Make SPA fallback exclude static asset extensions, eliminating the cache-poisoning vector.
-- Wire CI: lint + tests + Bicep deploy.
+- Move session tickets to shared storage before using multiple workers or instances.
+- Add rate limiting, Application Insights, and deployment alerts.
 - Real branch data + Maps integration if going beyond demo.

@@ -1,0 +1,68 @@
+{
+  "restaurant": "Marina Meals",
+  "currency": "INR",
+  "currency_symbol": "₹",
+  "note": "Sample/demo data. Prices and availability are read live on each tool call so they can be edited during the demo. 'tamil_name' enables Tamil-language grounding.",
+  "last_updated": "2026-06-11",
+  "categories": [
+    {
+      "id": "tiffin",
+      "name": "Tiffin / Breakfast",
+      "tamil_name": "டிபன்",
+      "items": [
+        { "id": "idli", "name": "Idli (2 pcs)", "tamil_name": "இட்லி", "price": 40, "veg": true, "available": true, "daily_special": false, "description": "Steamed rice cakes with sambar and chutney.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Idli%20Sambar-Noida-UP-SP004.jpg?width=640" },
+        { "id": "medu_vada", "name": "Medu Vada (2 pcs)", "tamil_name": "மெது வடை", "price": 50, "veg": true, "available": true, "daily_special": false, "description": "Crispy fried lentil donuts.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aesthetic%20Medu%20Vadai.jpg?width=640" },
+        { "id": "plain_dosa", "name": "Plain Dosa", "tamil_name": "தோசை", "price": 60, "veg": true, "available": true, "daily_special": false, "description": "Crisp rice-and-lentil crepe.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Plain%20Dosa%20from%20North%20India.jpg?width=640" },
+        { "id": "masala_dosa", "name": "Masala Dosa", "tamil_name": "மசாலா தோசை", "price": 90, "veg": true, "available": true, "daily_special": true, "description": "Dosa filled with spiced potato masala.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Masala%20dosa%202.jpg?width=640" },
+        { "id": "ghee_roast", "name": "Ghee Roast Dosa", "tamil_name": "நெய் ரோஸ்ட்", "price": 120, "veg": true, "available": true, "daily_special": false, "description": "Extra-crisp dosa roasted in ghee.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ghee%20roast%2005.jpg?width=640" },
+        { "id": "rava_dosa", "name": "Rava Dosa", "tamil_name": "ரவா தோசை", "price": 100, "veg": true, "available": true, "daily_special": false, "description": "Lacy semolina dosa.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rava%20dosa.JPG?width=640" },
+        { "id": "pongal", "name": "Ven Pongal", "tamil_name": "வெண் பொங்கல்", "price": 70, "veg": true, "available": true, "daily_special": false, "description": "Creamy rice-and-lentil dish with pepper and ghee.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ven%20Pongal%20with%20cashew.jpg?width=640" },
+        { "id": "poori", "name": "Poori Masala (2 pcs)", "tamil_name": "பூரி", "price": 80, "veg": true, "available": true, "daily_special": false, "description": "Puffed fried bread with potato masala.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Poori%20with%20Potato%20Masala.JPG?width=640" },
+        { "id": "idiyappam", "name": "Idiyappam (3 pcs)", "tamil_name": "இடியாப்பம்", "price": 70, "veg": true, "available": true, "daily_special": false, "description": "Steamed string hoppers with coconut milk.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Idiyappam.jpg?width=640" }
+      ]
+    },
+    {
+      "id": "meals",
+      "name": "Meals & Mains",
+      "tamil_name": "சாப்பாடு",
+      "items": [
+        { "id": "south_indian_meals", "name": "South Indian Meals (banana leaf)", "tamil_name": "இலை சாப்பாடு", "price": 180, "veg": true, "available": true, "daily_special": true, "description": "Unlimited rice, sambar, rasam, kootu, poriyal, curd, payasam.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/A%20Thali%2C%20famous%20South%20Indian%20meal%20served%20on%20a%20banana%20leaf.jpg?width=640" },
+        { "id": "curd_rice", "name": "Curd Rice", "tamil_name": "தயிர் சாதம்", "price": 70, "veg": true, "available": true, "daily_special": false, "description": "Comforting curd rice with tempering.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Curd%20Rice.jpg?width=640" },
+        { "id": "sambar_rice", "name": "Sambar Rice", "tamil_name": "சாம்பார் சாதம்", "price": 90, "veg": true, "available": true, "daily_special": false, "description": "Rice mixed with hearty lentil sambar.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Drumstick%20sambar%20%2C%20Morekulambu%20%26%20White%20rice.jpg?width=640" },
+        { "id": "lemon_rice", "name": "Lemon Rice", "tamil_name": "எலுமிச்சை சாதம்", "price": 80, "veg": true, "available": true, "daily_special": false, "description": "Tangy turmeric-lemon rice.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Chitranna%20%28Lemon%20Rice%29%20prepared%20by%20an%20indian%20woman.jpg?width=640" },
+        { "id": "kothu_parotta", "name": "Kothu Parotta", "tamil_name": "கொத்து பரோட்டா", "price": 150, "veg": false, "available": true, "daily_special": false, "description": "Shredded parotta stir-fried with egg and spices.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kothu%20Parotta%20%28Chicken%29%20as%20served%20in%20Tamil%20Nadu%2C%20India.jpg?width=640" },
+        { "id": "parotta_salna", "name": "Parotta with Salna (2 pcs)", "tamil_name": "பரோட்டா சல்னா", "price": 90, "veg": false, "available": true, "daily_special": false, "description": "Flaky layered flatbread with spicy gravy.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Parotta%20with%20Salna-Thoothukudi-Tamil%20Nadu-DED%20002.jpg?width=640" },
+        { "id": "chettinad_chicken", "name": "Chettinad Chicken", "tamil_name": "செட்டிநாடு கோழி", "price": 220, "veg": false, "available": true, "daily_special": true, "description": "Fiery Chettinad-style chicken curry.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/ChickenChettinad.JPG?width=640" },
+        { "id": "chicken_biryani", "name": "Chicken Biryani", "tamil_name": "சிக்கன் பிரியாணி", "price": 200, "veg": false, "available": true, "daily_special": false, "description": "Seeraga samba rice biryani with chicken.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Chicken%20Hyderabadi%20Biryani.JPG?width=640" },
+        { "id": "mutton_biryani", "name": "Mutton Biryani", "tamil_name": "மட்டன் பிரியாணி", "price": 280, "veg": false, "available": true, "daily_special": false, "description": "Tender mutton biryani.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Mutton%20biryani.JPG?width=640" },
+        { "id": "fish_curry_meals", "name": "Fish Curry Meals", "tamil_name": "மீன் குழம்பு சாப்பாடு", "price": 240, "veg": false, "available": false, "daily_special": false, "description": "Meals with tangy Chennai-style fish curry. (Currently unavailable.)", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sheela%20Meen%20Kuzhambu.JPG?width=640" }
+      ]
+    },
+    {
+      "id": "drinks",
+      "name": "Drinks",
+      "tamil_name": "பானங்கள்",
+      "items": [
+        { "id": "filter_coffee", "name": "Filter Coffee", "tamil_name": "பில்டர் காபி", "price": 40, "veg": true, "available": true, "daily_special": false, "description": "Authentic South Indian degree coffee.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Indian%20filter%20coffee%20in%20Dabarah.jpg?width=640" },
+        { "id": "masala_tea", "name": "Masala Tea", "tamil_name": "மசாலா டீ", "price": 30, "veg": true, "available": true, "daily_special": false, "description": "Spiced milk tea.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Masala%20Chai.jpg?width=640" },
+        { "id": "jigarthanda", "name": "Jigarthanda", "tamil_name": "ஜிகர்தண்டா", "price": 90, "veg": true, "available": true, "daily_special": true, "description": "Chilled milk drink with almond gum, basundi and ice cream.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Jigarthanda.jpg?width=640" },
+        { "id": "rose_milk", "name": "Rose Milk", "tamil_name": "ரோஸ் மில்க்", "price": 60, "veg": true, "available": true, "daily_special": false, "description": "Cold rose-flavoured milk.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rose%20milk.jpg?width=640" },
+        { "id": "neer_mor", "name": "Neer Mor (Spiced Buttermilk)", "tamil_name": "நீர் மோர்", "price": 30, "veg": true, "available": true, "daily_special": false, "description": "Cooling spiced buttermilk.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Neer%20moru%20spiced%20buttermilk.jpg?width=640" },
+        { "id": "tender_coconut", "name": "Tender Coconut", "tamil_name": "இளநீர்", "price": 50, "veg": true, "available": true, "daily_special": false, "description": "Fresh tender coconut water.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Tender%20coconut%20water%2002.jpg?width=640" },
+        { "id": "badam_milk", "name": "Badam Milk", "tamil_name": "பாதாம் பால்", "price": 70, "veg": true, "available": true, "daily_special": false, "description": "Warm almond-saffron milk.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Home-made%20almond%20milk%2C%20November%202012.jpg?width=640" }
+      ]
+    },
+    {
+      "id": "sweets",
+      "name": "Sweets & Desserts",
+      "tamil_name": "இனிப்புகள்",
+      "items": [
+        { "id": "mysore_pak", "name": "Mysore Pak", "tamil_name": "மைசூர் பாக்", "price": 50, "veg": true, "available": true, "daily_special": false, "description": "Rich ghee-and-gram-flour fudge.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ghee%20Mysore%20Pak.jpg?width=640" },
+        { "id": "payasam", "name": "Payasam", "tamil_name": "பாயசம்", "price": 60, "veg": true, "available": true, "daily_special": false, "description": "Traditional milk-and-vermicelli pudding.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Semiya%20Payasam%20Vermicelli%20Kheer%20Indian%20Sweets%20Mithai.jpg?width=640" },
+        { "id": "gulab_jamun", "name": "Gulab Jamun (2 pcs)", "tamil_name": "குலாப் ஜாமூன்", "price": 50, "veg": true, "available": true, "daily_special": false, "description": "Soft fried dough balls in sugar syrup.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Two%20Gulab%20Jamun%20in%20a%20plate%2001.jpg?width=640" },
+        { "id": "adhirasam", "name": "Adhirasam", "tamil_name": "அதிரசம்", "price": 40, "veg": true, "available": true, "daily_special": false, "description": "Traditional jaggery-rice sweet.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Adhirasam2a.jpg?width=640" },
+        { "id": "kesari", "name": "Rava Kesari", "tamil_name": "கேசரி", "price": 40, "veg": true, "available": true, "daily_special": false, "description": "Sweet semolina with ghee and saffron.", "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kesari%20bhath.jpg?width=640" }
+      ]
+    }
+  ]
+}

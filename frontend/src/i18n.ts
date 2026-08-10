@@ -1,0 +1,78 @@
+// English-default UI strings with a Tamil toggle. Menu data (names, descriptions)
+// stays in their original languages from menu.json — we show English by default
+// and surface the Tamil names as secondary labels (or swap them on toggle).
+export type Lang = "en" | "ta";
+
+export const STRINGS: Record<Lang, Record<string, string>> = {
+  en: {
+    tagline: "Chennai-style tiffin, meals & degree coffee",
+    sub_tagline: "Talk to our host in English or Tamil",
+    cta_talk: "Tap to talk",
+    cta_listening: "Listening…",
+    cta_connecting: "Connecting…",
+    cta_thinking: "Thinking…",
+    cta_speaking: "Speaking…",
+    cta_error: "Connection error",
+    reset: "Reset",
+    veg_only: "Veg only",
+    all: "All",
+    menu: "Menu",
+    order: "Your order",
+    branches: "Our branches",
+    empty_cart: "Your cart is empty. Try saying \"Order two masala dosa and a filter coffee for Adyar pickup.\"",
+    total: "Total",
+    pickup: "Pickup at",
+    confirmation: "Confirmation",
+    open_now: "Open now",
+    closed: "Closed",
+    todays_special: "Today's special",
+    unavailable: "Unavailable",
+    you: "You",
+    host: "Host",
+    powered: "Voice powered by Azure Voice Live · grounded in real-time kitchen data",
+    examples_title: "Try saying",
+    examples: "“What's good for breakfast?” · “Masala dosa price?” · “Is there a store in Adyar?” · “Order 2 dosa and a coffee for Adyar.”",
+    category_tiffin: "Tiffin / Breakfast",
+    category_meals: "Meals & Mains",
+    category_drinks: "Drinks",
+    category_sweets: "Sweets",
+  },
+  ta: {
+    tagline: "சென்னை ஸ்டைல் டிபன், சாப்பாடு & டிகிரி காபி",
+    sub_tagline: "எங்கள் ஹோஸ்ட்டுடன் ஆங்கிலம் அல்லது தமிழில் பேசுங்கள்",
+    cta_talk: "பேச அழுத்து",
+    cta_listening: "கேட்கிறது…",
+    cta_connecting: "இணைக்கிறது…",
+    cta_thinking: "யோசிக்கிறது…",
+    cta_speaking: "பேசுகிறது…",
+    cta_error: "இணைப்பு பிழை",
+    reset: "மீட்டமை",
+    veg_only: "சைவம் மட்டும்",
+    all: "அனைத்தும்",
+    menu: "மெனு",
+    order: "உங்கள் ஆர்டர்",
+    branches: "எங்கள் கிளைகள்",
+    empty_cart: "கார்ட் காலியாக உள்ளது. \"அடையாருக்கு இரண்டு மசாலா தோசை, ஒரு காபி ஆர்டர் பண்ணு\" என்று சொல்லி பாருங்கள்.",
+    total: "மொத்தம்",
+    pickup: "எடுக்க கிளை",
+    confirmation: "உறுதி எண்",
+    open_now: "திறந்துள்ளது",
+    closed: "மூடப்பட்டது",
+    todays_special: "இன்றைய ஸ்பெஷல்",
+    unavailable: "கிடைக்கவில்லை",
+    you: "நீங்கள்",
+    host: "ஹோஸ்ட்",
+    powered: "Azure Voice Live மூலம் இயக்கப்படும் · நிகழ்நேர சமையலறை தரவு",
+    examples_title: "இப்படி சொல்லி பாருங்கள்",
+    examples: "“காலை சாப்பாட்டுக்கு என்ன நல்லது?” · “மசாலா தோசை எவ்வளவு?” · “அடையாரில் கிளை இருக்கா?” · “அடையாருக்கு 2 தோசை, ஒரு காபி ஆர்டர் பண்ணு.”",
+    category_tiffin: "டிபன் / காலை சாப்பாடு",
+    category_meals: "சாப்பாடு",
+    category_drinks: "பானங்கள்",
+    category_sweets: "இனிப்புகள்",
+  },
+};
+
+export const categoryLabel = (lang: Lang, id: string): string => {
+  const key = `category_${id}`;
+  return STRINGS[lang][key] ?? id;
+};

@@ -1,0 +1,79 @@
+{
+  "restaurant": "Marina Meals",
+  "note": "Sample/demo branch data for the Chennai voice demo. Phone numbers and exact street addresses are illustrative placeholders, not real businesses. Coordinates are approximate locality centres (public geography). 'hours' is used with current time to compute open_now in the find_store tool.",
+  "timezone": "Asia/Kolkata",
+  "stores": [
+    {
+      "id": "mm-tnagar",
+      "name": "Marina Meals — T. Nagar",
+      "area": "T. Nagar",
+      "tamil_area": "டி. நகர்",
+      "address": "Sample address, Usman Road, T. Nagar, Chennai 600017",
+      "phone": "+91 44 2815 0001",
+      "hours": { "open": "07:00", "close": "22:30" },
+      "lat": 13.0418,
+      "lng": 80.2341,
+      "landmark": "Near Panagal Park"
+    },
+    {
+      "id": "mm-adyar",
+      "name": "Marina Meals — Adyar",
+      "area": "Adyar",
+      "tamil_area": "அடையார்",
+      "address": "Sample address, Lattice Bridge Road, Adyar, Chennai 600020",
+      "phone": "+91 44 2440 0002",
+      "hours": { "open": "07:00", "close": "22:30" },
+      "lat": 13.0067,
+      "lng": 80.2570,
+      "landmark": "Near Adyar Signal"
+    },
+    {
+      "id": "mm-velachery",
+      "name": "Marina Meals — Velachery",
+      "area": "Velachery",
+      "tamil_area": "வேளச்சேரி",
+      "address": "Sample address, Velachery Main Road, Velachery, Chennai 600042",
+      "phone": "+91 44 2255 0003",
+      "hours": { "open": "07:30", "close": "23:00" },
+      "lat": 12.9791,
+      "lng": 80.2210,
+      "landmark": "Near Phoenix MarketCity"
+    },
+    {
+      "id": "mm-annanagar",
+      "name": "Marina Meals — Anna Nagar",
+      "area": "Anna Nagar",
+      "tamil_area": "அண்ணா நகர்",
+      "address": "Sample address, 2nd Avenue, Anna Nagar, Chennai 600040",
+      "phone": "+91 44 2620 0004",
+      "hours": { "open": "07:00", "close": "22:00" },
+      "lat": 13.0850,
+      "lng": 80.2101,
+      "landmark": "Near Anna Nagar Tower Park"
+    },
+    {
+      "id": "mm-mylapore",
+      "name": "Marina Meals — Mylapore",
+      "area": "Mylapore",
+      "tamil_area": "மயிலாப்பூர்",
+      "address": "Sample address, North Mada Street, Mylapore, Chennai 600004",
+      "phone": "+91 44 2499 0005",
+      "hours": { "open": "06:30", "close": "22:00" },
+      "lat": 13.0339,
+      "lng": 80.2691,
+      "landmark": "Near Kapaleeshwarar Temple"
+    },
+    {
+      "id": "mm-omr",
+      "name": "Marina Meals — OMR (Thoraipakkam)",
+      "area": "OMR",
+      "tamil_area": "ஓ.எம்.ஆர்",
+      "address": "Sample address, Old Mahabalipuram Road, Thoraipakkam, Chennai 600097",
+      "phone": "+91 44 2496 0006",
+      "hours": { "open": "08:00", "close": "23:30" },
+      "lat": 12.9416,
+      "lng": 80.2339,
+      "landmark": "Near Thoraipakkam Junction"
+    }
+  ]
+}

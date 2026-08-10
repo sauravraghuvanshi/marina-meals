@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.env.local
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+credentials.json
+secrets.json
+
+# Logs and local runtime data
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -31,6 +31,9 @@ secrets.json
 # Logs and local runtime data
 *.log
 
+# Demo recordings are published as GitHub Release assets.
+Demo-Video/
+
 # Editor / OS
 .vscode/
 .idea/

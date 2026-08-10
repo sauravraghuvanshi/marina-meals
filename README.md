@@ -73,16 +73,17 @@ marina-meals/
 ├── backend/
 │   ├── main.py                     # FastAPI app, /api/*, /ws/voice proxy, static mount
 │   ├── tools.py                    # 5 tool handlers (server-side totals)
+│   ├── voice_config.py             # authoritative prompt, tools, and Voice Live session
 │   ├── requirements.txt
 │   ├── .env.example
-│   └── tests/test_tools.py         # 20 unit tests
+│   └── tests/                      # tool and proxy security tests
 └── frontend/
     ├── public/
     │   ├── favicon.svg             # Marina Meals mark
     │   └── pcm16-worklet.js        # AudioWorklet (must be plain JS, see LEARNINGS)
     └── src/
         ├── audio/{recorder,player,pcm16-worklet}.ts
-        ├── voice/voiceLiveClient.ts  # WS client → /ws/voice proxy
+        ├── voice/voiceLiveClient.ts  # constrained WS client → /ws/voice proxy
         ├── i18n.ts                   # EN/TA strings
         ├── App.tsx                   # main UI (hero, menu grid, cart, store cards)
         └── styles.css                # premium design system
@@ -100,7 +101,7 @@ marina-meals/
 ```powershell
 cd backend
 pip install -r requirements.txt
-python -m pytest tests -q                # 20 unit tests
+python -m pytest tests -q                # 32 unit tests
 cd ..
 uvicorn backend.main:app --reload --port 8000
 ```
@@ -113,9 +114,20 @@ VOICE_LIVE_MODEL=<your-ga-model-deployment>
 VOICE_LIVE_API_VERSION=<current-ga-api-version>
 TTS_VOICE=ta-IN-PallaviNeural
 STT_LANGUAGES=en-IN,ta-IN
+REQUIRE_APP_AUTH=false
+ENTRA_TENANT_ID=<your-tenant-id>
+ENTRA_CLIENT_ID=<your-app-registration-client-id>
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 > **Endpoint note:** Voice Live runs on the **new Azure AI Foundry** endpoint (`*.services.ai.azure.com`). Confirm the current GA API version in Microsoft Learn rather than copying a stale value. The managed identity needs both `Cognitive Services User` and `Foundry User` roles on the AI Services resource.
 No key needed — `DefaultAzureCredential` picks up your `az login`.
+
+For production, enable App Service Authentication with Microsoft Entra ID,
+enable its token store, set unauthenticated requests to HTTP 401, and configure
+`REQUIRE_APP_AUTH=true`, `ENTRA_TENANT_ID`, and `ENTRA_CLIENT_ID`. The backend
+cryptographically validates the injected Entra ID token rather than trusting
+identity headers alone. The WebSocket proxy also requires an exact same-origin
+request and a short-lived, single-use ticket minted by `/api/session`.
 
 ### Frontend
 ```powershell

@@ -24,7 +24,7 @@ the always-on guardrails; when in doubt, defer to `implementation.md`.
 6. **Scope-locked (RAG-only).** The agent answers ONLY menu / price / branch / order questions.
    Out-of-scope prompts (general knowledge, coding, weather, recipes, jokes, "who is the PM of
    India") get a one-line refusal + steer back to the menu — never a partial answer. See the
-   SCOPE section of the SYSTEM_PROMPT in `frontend/src/voice/voiceLiveClient.ts`.
+   SCOPE section of the SYSTEM_PROMPT in `backend/voice_config.py`.
 7. **Sharp, no oversharing.** No dish descriptions, ingredients, praise, or unsolicited
    recommendations. Open questions ("what's on the menu") trigger ONE clarifying question
    first. Keep `temperature: 0.6` and `max_response_output_tokens: 200` in `session.update`.

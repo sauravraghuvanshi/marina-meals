@@ -11,10 +11,10 @@ next. Captures what worked, what broke, and which mistakes to not repeat.
 - [ ] **Enable WebSockets on App Service** explicitly (`az webapp config set --web-sockets-enabled true`).
 - [ ] When packaging from PowerShell, place `requirements.txt` and the frontend `dist/` so they land at zip root.
 - [ ] For Voice Live in the browser: use the server-side `/ws/voice` proxy — never try to authenticate the WebSocket from the browser.
-- [ ] **Do not soften the SYSTEM_PROMPT** in `voiceLiveClient.ts`. The LANGUAGE / SCOPE / STYLE / SHOW vs TELL sections are imperative and example-anchored on purpose — see Bug #10 and #12.
+- [ ] **Do not soften the SYSTEM_PROMPT** in `backend/voice_config.py`. The LANGUAGE / SCOPE / STYLE / SHOW vs TELL sections are imperative and example-anchored on purpose — see Bug #10 and #12.
 - [ ] Keep `temperature: 0.6` and `max_response_output_tokens: 200` in `session.update`. Removing them brings back the overshare behavior.
 - [ ] Keep STT language order as `en-IN,ta-IN` (English first) in both the backend `STT_LANGUAGES` appsetting and the frontend fallback. Required to stop the agent flipping to Tamil on a single Tamil dish name.
-- [ ] Keep the proactive English greeting (`sendGreeting()` fired once on `session.updated`). It is what makes the agent open in English instead of waiting for the user (and prevents a Tamil opener).
+- [ ] Keep the proactive English greeting sent by the backend proxy once on `session.updated`. It is what makes the agent open in English instead of waiting for the user.
 - [ ] Keep panel auto-close hooks in `App.tsx`: `onUserSpeechStart` and the non-`show_on_screen` clear inside `handleTool`. Without them the modal lingers after the user moves on.
 
 ---
@@ -81,7 +81,7 @@ The model will guess prices if you let it. The system prompt explicitly forbids 
 
 ### 8. Wrong AI Foundry account scope in the portal
 - **Symptom:** User couldn't see `gpt-realtime` deployment in https://ai.azure.com.
-- **Cause:** Foundry portal defaulted to a different AI Services account (`foundryrestaurantapp`) in the same RG.
+- **Cause:** Foundry portal defaulted to a different AI Services account in the same resource group.
 - **Fix:** Use the resource picker top-right in ai.azure.com to switch to the intended AI Services resource, or deep-link via `/resource/deployments?wsid=<resource-id>`.
 
 ### 9. We added images to `menu.json` even though spec said "use as-is"
@@ -95,7 +95,7 @@ The model will guess prices if you let it. The system prompt explicitly forbids 
 
 **Root cause:** the original prompt said *"reply in the same language the customer used"* and *"warm, welcoming, proud of Chennai food. Suggest today's specials when relevant."* — both are too soft. A realtime model interprets soft style guidance generously and a multilingual model interprets "same language" too literally on a single token.
 
-**Fix (see `frontend/src/voice/voiceLiveClient.ts` SYSTEM_PROMPT):**
+**Fix (see `backend/voice_config.py` SYSTEM_PROMPT):**
 - LANGUAGE section now opens with **"DEFAULT to English"** and explicitly says a single Tamil word does not count as Tamil. Only a full Tamil sentence flips the agent.
 - SCOPE section explicitly enumerates the off-topic categories and gives the exact refusal sentence verbatim. The "who is the PM of India" anchor matters — it tested badly without that exact example.
 - STYLE section forbids descriptions, ingredients, praise, and dumping the full menu. Requires ONE clarifying question for open prompts.
@@ -122,7 +122,7 @@ We added a 6th tool `show_on_screen({ title, item_ids })` that does **not** hit 
 - After the modal opened, asking the next question (e.g. "add masala dosa to my order") left the modal sitting on top of the UI until the user manually dismissed it.
 
 **Fixes:**
-1. **Proactive English greeting** — `VoiceLiveClient.sendGreeting()` fires once on `session.updated` with a `response.create` whose `instructions` hard-code an English single-sentence opener ("Hi, I'm your Marina Meals companion — how can I help you today?"). Guarded by a `greeted` flag so it doesn't repeat. This anchors the first turn in English before the customer says anything.
+1. **Proactive English greeting** — the backend proxy sends one `response.create` after the authoritative `session.updated` event with a fixed English opener. A one-shot flag prevents repetition and anchors the first turn before the customer speaks.
 2. **LANGUAGE prompt is now stricter** — opens with "Your DEFAULT and ONLY starting language is English. The very first thing you ever say MUST be in English. Never open in Tamil." Adds explicit anti-examples (Tamil dish names, "vanakkam", accent, code-mixed → still English) and a "when in doubt → English" tiebreaker.
 3. **SHOW vs TELL verb split** in both the prompt and the `show_on_screen` tool description:
    - `show / display / see / put on screen` → call `show_on_screen`, say only "Shown on screen." and stop. Do NOT read the items, do NOT ask "should I read them?".
@@ -150,13 +150,13 @@ We added a 6th tool `show_on_screen({ title, item_ids })` that does **not** hit 
 - After config + role change, **restart the App Service** (or wait for the cred cache to expire) so the next WS proxy connection picks up the new endpoint.
 
 **Smoke test that proves the migration worked end-to-end (server-side):**
-Connect to `wss://<app-name>.azurewebsites.net/ws/voice`, send a `session.update` probe, and expect `session.created` → `session.updated`. If you see `session.updated`, the proxy → Foundry handshake, MI auth, and Voice Live config negotiation are all healthy. Voice/UX still needs a manual browser pass.
+Connect through the application flow, obtain a short-lived ticket from `/api/session`, and open `/ws/voice` with the same authenticated browser session. Expect `session.created` followed by `session.updated`; client-supplied `session.update` events are intentionally rejected.
 
 ---
 
 - **Server-side totals on `place_order`.** Never trust the model to compute money — recompute on the backend and return the canonical total. The model parrots whatever we send back.
 - **Read JSON fresh on every tool call.** No in-memory caching. Lets you edit `menu.json` mid-demo to prove the grounding is real-time.
-- **Unit tests on the tool layer.** 20 tests in `backend/tests/test_tools.py` catch regressions in matching/totals. Run `python -m pytest backend/tests -q` before every deploy.
+- **Unit and security tests.** The backend suite covers matching, totals, authentication, ticket replay, origin checks, event filtering, and path containment. Run `python -m pytest backend/tests -q` before every deploy.
 - **Detailed logging on the WS proxy.** When the proxy broke, the only thing that saved us was the per-step log lines (`got token`, `upstream connected`, etc.). Keep them.
 - **One env var, one place.** `AZURE_SPEECH_ENDPOINT`, `VOICE_LIVE_MODEL`, `VOICE_LIVE_API_VERSION`, `TTS_VOICE`, `STT_LANGUAGES` are all read at request time, not import time, so flipping voice/language doesn't require a redeploy.
 

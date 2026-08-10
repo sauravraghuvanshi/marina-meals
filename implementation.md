@@ -133,6 +133,7 @@ marina-meals/
 ├── backend/
 │   ├── main.py                  ← FastAPI app: /api/session + tool handlers
 │   ├── tools.py                 ← function-call implementations (read live data)
+│   ├── voice_config.py          ← authoritative prompt, tools, and session config
 │   ├── voice_live.py            ← (optional) server-side proxy for the WS session
 │   ├── requirements.txt
 │   └── .env.example
@@ -256,9 +257,10 @@ implement matching handlers in the backend):
 
 ## 7. Voice Live session configuration
 
-Recommended split: run the **WebSocket session in the browser** for lowest latency, but mint
-credentials server-side via `GET /api/session` (so the Speech key never ships to the client).
-The browser opens the Voice Live WebSocket, then immediately sends `session.update`:
+The browser connects through the server-side `/ws/voice` proxy because browsers cannot attach
+the managed-identity authorization header. `GET /api/session` returns a short-lived, single-use
+ticket. After validating the authenticated identity, ticket, and origin, the proxy opens Voice
+Live and sends the authoritative `session.update` itself:
 
 ```jsonc
 {
@@ -309,7 +311,7 @@ on, the service detects turn ends automatically (no manual commit needed in VAD 
 
 ## 8. System prompt (persona + rules)
 
-Use this as the `instructions` value. The agent is **English-default, scope-locked, and
+Use this as the server-owned `instructions` value in `backend/voice_config.py`. The agent is **English-default, scope-locked, and
 sharp**. Do not soften any of these rules — they exist because the post-demo failure modes were
 (a) flipping to Tamil on a single Tamil word, (b) over-explaining dishes, and (c) answering
 out-of-scope questions like "who is the PM of India".
@@ -397,7 +399,7 @@ ORDERING:
   or ×, (b) the customer's next utterance (`input_audio_buffer.speech_started` →
   `onUserSpeechStart` callback), or (c) any non-`show_on_screen` tool call (price lookup, find
   store, place order, etc.). This visual sync is the demo "wow".
-- **Proactive greeting:** the Voice Live client sends a `response.create` once on
+- **Proactive greeting:** the backend Voice Live proxy sends a `response.create` once on
   `session.updated` so the agent opens with a fixed English single-sentence greeting
   ("Hi, I'm your Marina Meals companion — how can I help you today?") instead of waiting for
   the user to speak first. Guarded by a one-shot flag so it doesn't repeat. This prevents the
@@ -450,8 +452,8 @@ Tamil text must use a font with proper Tamil glyph support (e.g. "Noto Sans Tami
 3. **`/api/session`**: mint credentials; return WS URL + model + voice. Verify the key is never
    sent to the client.
 4. **Frontend audio**: `recorder.ts` (mic → PCM16 24kHz) and `player.ts` (delta playback queue).
-5. **Voice client**: `voiceLiveClient.ts` — open WS, send `session.update` (§7), handle events,
-   wire tool calls to the backend, return `function_call_output`.
+5. **Voice session**: `backend/voice_config.py` owns `session.update`; `voiceLiveClient.ts`
+   streams audio, handles events, dispatches tools, and returns constrained function outputs.
 6. **UI sync**: menu/cart/store cards react to tool calls; live state indicator; captions.
 7. **Theme** (§11) + reset button.
 8. **Test**: the Tanglish phrase list (§4); barge-in; an end-to-end order; tool-grounded prices.

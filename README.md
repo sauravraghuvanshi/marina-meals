@@ -10,7 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sauravraghuvanshi/marina-meals/releases/tag/v1.0-demo">
+  <a href="https://marina-meals-sri.azurewebsites.net/">
+    <img alt="Open live application" src="https://img.shields.io/badge/Open_Live_Application-2E7D32?style=for-the-badge&logo=microsoftazure&logoColor=white">
+  </a>
+  <a href="#demo-walkthrough">
     <img alt="Watch the demo" src="https://img.shields.io/badge/Watch_the_demo-FF8A00?style=for-the-badge&logo=youtube&logoColor=white">
   </a>
   <img alt="React" src="https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">
@@ -33,12 +36,19 @@ The customer can speak naturally instead of navigating a traditional ordering fl
 
 Restaurant facts are never generated from model memory. Prices, availability, stores, and order totals come from backend tools that read the current restaurant data.
 
+## Try the live application
+
+**[Open Marina Meals · சென்னை](https://marina-meals-sri.azurewebsites.net/)**
+
+Allow microphone access, select **Tap to talk**, and ask about the menu, prices, branches, or a pickup order.
+
 ## Demo walkthrough
 
-The complete project walkthrough is published as a GitHub Release asset so the repository remains lightweight.
+Watch the complete walkthrough directly in GitHub:
 
-- [Watch or download the Marina Meals demo](https://github.com/sauravraghuvanshi/marina-meals/releases/download/v1.0-demo/Marina.Meals.Demo.mp4)
-- [Open the demo release page](https://github.com/sauravraghuvanshi/marina-meals/releases/tag/v1.0-demo)
+https://github.com/user-attachments/assets/7081a63d-bdb1-46e0-a4b3-cee455992a15
+
+For the original full-resolution recording, [open the demo release](https://github.com/sauravraghuvanshi/marina-meals/releases/tag/v1.0-demo).
 
 ## Example use cases
 

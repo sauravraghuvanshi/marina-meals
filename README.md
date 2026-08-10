@@ -21,6 +21,12 @@
   <img alt="Azure" src="https://img.shields.io/badge/Azure_AI_Foundry-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white">
 </p>
 
+<p align="center">
+  <a href="https://github.com/sauravraghuvanshi/marina-meals/actions/workflows/ci-cd.yml">
+    <img alt="CI/CD status" src="https://github.com/sauravraghuvanshi/marina-meals/actions/workflows/ci-cd.yml/badge.svg">
+  </a>
+</p>
+
 ## What is Marina Meals?
 
 Marina Meals is an end-to-end voice ordering demo for a fictional Chennai restaurant. It combines a responsive menu and branch interface with a real-time conversational host built on the **Azure Voice Live API** in the **new Azure AI Foundry**.
@@ -112,6 +118,23 @@ The browser never receives an Azure access token, API key, or Azure resource cre
 | AI platform | Azure AI Foundry with a latest-GA realtime model deployment |
 | Authentication | Microsoft Entra ID, App Service Authentication, managed identity |
 | Data | JSON today; tool contracts can later point to a database or POS API |
+
+## Continuous delivery
+
+GitHub Actions validates every push and pull request:
+
+- installs and checks Python dependencies;
+- runs the backend and security test suite;
+- installs frontend dependencies with `npm ci`;
+- runs the strict TypeScript and Vite production build.
+
+After validation, a push to `main` automatically deploys to the production
+Azure App Service and verifies `/api/health`.
+
+Deployment uses GitHub OpenID Connect and a dedicated, app-scoped managed
+identity. The repository contains no publish profile, Azure password, client
+secret, or long-lived deployment credential. Workflow actions are pinned to
+immutable commits, and Dependabot checks them weekly for updates.
 
 ## Run locally
 

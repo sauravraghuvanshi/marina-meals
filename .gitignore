@@ -34,6 +34,9 @@ secrets.json
 # Demo recordings are published as GitHub Release assets.
 Demo-Video/
 
+# Local Azure deployment planning state.
+.azure/
+
 # Editor / OS
 .vscode/
 .idea/
